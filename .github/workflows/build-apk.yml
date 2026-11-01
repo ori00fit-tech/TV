@@ -1,0 +1,65 @@
+name: Build launcher APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - goldvision-launcher.patch
+      - .github/workflows/build-apk.yml
+
+permissions:
+  contents: read
+
+env:
+  CLEANYOURTV_COMMIT: f47c893d285172d175c8f72c32658b1d767b3270
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout cleanyourtv at the pinned commit
+        uses: actions/checkout@v4
+        with:
+          repository: Gathin23/cleanyourtv
+          ref: ${{ env.CLEANYOURTV_COMMIT }}
+          path: cleanyourtv
+
+      - name: Apply the Goldvision patch
+        working-directory: cleanyourtv
+        run: git apply --verbose ../goldvision-launcher.patch
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: cleanyourtv/launcher/**/*.gradle*
+
+      - name: Install Android platform 34 and build-tools 34.0.0
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Test and build release APK
+        working-directory: cleanyourtv/launcher
+        run: ./gradlew --no-daemon testReleaseUnitTest assembleRelease
+
+      - name: Check APK size (under 576 KB)
+        working-directory: cleanyourtv/launcher
+        run: |
+          apk=app/build/outputs/apk/release/app-release.apk
+          size=$(stat -c %s "$apk")
+          echo "APK size: $size bytes"
+          test "$size" -lt 589824
+          mv "$apk" "$GITHUB_WORKSPACE/goldvision-tvhome.apk"
+          sha256sum "$GITHUB_WORKSPACE/goldvision-tvhome.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: goldvision-tvhome-apk
+          path: goldvision-tvhome.apk
+          retention-days: 30

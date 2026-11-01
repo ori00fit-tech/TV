@@ -23,7 +23,14 @@ Java عادي، بلا صلاحية إنترنت، بلا تتبّع، وحجم 
 الواجهة القديمة (CVTE) **لا تُحذف ولا تُعطّل**. هذه قاعدة لأجهزة CVTE: لا توجد واجهة احتياطية
 (FallbackHome)، وإذا عُطّلت قد لا يقلع التلفاز إلى واجهة. الواجهة الجديدة تحلّ محلها عبر إعادة التوجيه.
 
-## البناء
+## تحميل الـ APK من GitHub Actions
+
+سير العمل `.github/workflows/build-apk.yml` يبني الملف تلقائياً عند كل تعديل على الـ patch، أو يدوياً من
+تبويب **Actions** ثم **Build launcher APK** ثم **Run workflow**. افتح آخر تشغيل ناجح، وحمّل
+`goldvision-tvhome-apk` من قسم **Artifacts**، ثم فك الضغط لتحصل على `goldvision-tvhome.apk`.
+(استبدل `app-release.apk` بهذا الاسم في أوامر التثبيت أدناه.)
+
+## البناء يدوياً
 
 ```sh
 git clone https://github.com/Gathin23/cleanyourtv && cd cleanyourtv
