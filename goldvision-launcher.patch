@@ -28,7 +28,7 @@ index e49fabc..f525b37 100644
          if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
                  && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
 diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
-index c966c5f..c69e31b 100644
+index c966c5f..836b348 100644
 --- a/launcher/app/src/main/res/values/config.xml
 +++ b/launcher/app/src/main/res/values/config.xml
 @@ -17,10 +17,11 @@
@@ -109,7 +109,7 @@ index c966c5f..c69e31b 100644
  
      <!-- Basic motion is on; advanced effects are opt-in in the launcher's own Settings screen. -->
      <bool name="animations">true</bool>
-@@ -429,7 +432,7 @@
+@@ -429,14 +432,14 @@
  
      <!-- Module cards: an app that declares a card (docs/specs/card.md) can stand in for its tile with its own
           label, caption and glow colour, once you answer Show on the prompt. false: never look for cards or ask. -->
@@ -118,10 +118,14 @@ index c966c5f..c69e31b 100644
  
      <!-- Reduced motion: for TVs whose GPU cannot keep up (MediaTek MT5895 on Android 10 is the known case).
           true keeps the GPU drawing path but calms the movement and draws far fewer frames: the highlight
-@@ -437,7 +440,7 @@
-          glow stays, the ambient bloom is removed and the focus scale is smaller. -->
+          slides with no bounce and settles within 5 frames, every animation lasts 90 ms or less, names, top
+          shelf, glow and highlight appear instead of fading, and there is no tile entrance. Set it
+          here or with "reduced_motion": true in a theme's config.json; false keeps the normal motion. -->
 -    <bool name="reduced_motion">false</bool>
 +    <bool name="reduced_motion">true</bool>
+ 
+     <!-- The glass highlight springs past the tile it moves to and the focused tile zooms past its size
+          before settling. false: both go straight there, with no bounce, while scrolling stays smooth
 @@ -469,7 +472,7 @@
           colour; the shelf gets a larger name, a "Last opened" line (from the apps Home opened) and dock position
           dots, the focus glow takes the app's colour and the dock band turns translucent. false keeps the plain
