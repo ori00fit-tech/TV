@@ -1,0 +1,129 @@
+diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
+index ca18afa..afad6b7 100644
+--- a/launcher/app/src/main/AndroidManifest.xml
++++ b/launcher/app/src/main/AndroidManifest.xml
+@@ -65,6 +65,8 @@
+         <package android:name="com.xiaomi.mitv.settings" />
+         <package android:name="com.tcl.settings" />
+         <package android:name="com.amazon.tv.launcher" />
++        <!-- CVTE input picker (source_panel_service on CVTE boards). -->
++        <package android:name="com.cvte.tv.globalui" />
+         <!-- Coocaa OS sources for the Inputs menu (coocaa_sources); see CoocaaSources. -->
+         <provider android:authorities="com.skyworth.tv.provider" />
+         <provider android:authorities="com.skyworth.tv.sdk.provider" />
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
+index e49fabc..f525b37 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
+@@ -1387,6 +1387,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         if (resumed && event.getKeyCode() >= 1000 && RemoteKeys.handle(this, event, homeAppKeys.get(event.getKeyCode()),
+                 homeHoldAppKeys.get(event.getKeyCode()))) return true;
+         if (handleSettingsKey(event)) return true;
++        // CVTE firmware hands the remote's SOURCE key to the app in front: on Home, open the input picker.
++        if (!reordering && !sourcePanelService.isEmpty() && event.getKeyCode() == KeyEvent.KEYCODE_TV_INPUT) {
++            if (event.getAction() == KeyEvent.ACTION_UP) showInputs();
++            return true;
++        }
+         if (holdOk(event)) return true;
+         if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
+                 && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
+index c966c5f..c69e31b 100644
+--- a/launcher/app/src/main/res/values/config.xml
++++ b/launcher/app/src/main/res/values/config.xml
+@@ -17,10 +17,11 @@
+ 
+     <!-- Apps pinned to the dock row at the bottom, in this order. Missing apps are skipped. -->
+     <string-array name="dock_apps">
+-        <item>com.netflix.ninja</item>
+-        <item>com.amazon.amazonvideo.livingroom</item>
+         <item>com.google.android.youtube.tv</item>
+-        <item>in.startv.hotstar</item>
++        <item>com.stremio.one</item>
++        <item>com.mvas.stb.emu.free</item>
++        <item>com.esaba.downloader</item>
++        <item>com.android.vending</item>
+     </string-array>
+     <!-- With fewer dock_apps than columns (or a dock app that is not installed), the free dock slots take
+          the first grid apps, so the dock never shows a gap. false leaves them empty (#162); a theme can
+@@ -29,12 +30,14 @@
+ 
+     <!-- Apps never shown as tiles (e.g. the Live TV app, which the Inputs menu already covers). -->
+     <string-array name="hidden_apps">
+-        <item>com.mediatek.wwtv.tvcenter</item>
+-        <item>com.mitv.gallery</item>
++        <item>com.stark.store</item>
++        <item>com.cvte.tv.steward</item>
++        <item>com.cvte.tv.pictorial</item>
++        <item>com.android.traceur</item>
+     </string-array>
+ 
+     <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->
+-    <string name="live_tv_package" translatable="false">com.mediatek.wwtv.tvcenter</string>
++    <string name="live_tv_package" translatable="false"></string>
+ 
+     <!-- Open the Live TV app above the first time Home comes up after the TV is switched on, for sets that are
+          mostly used for broadcast TV. Once per boot: Home after that stays Home. Can also be set with
+@@ -93,7 +96,7 @@
+          offers one row that starts this service: component first, then action. The component can also be an
+          activity, for sets whose panel is a dialog (BYINTEK U4). With no Live TV app either, the Inputs pill
+          opens the panel directly instead of a menu. Leave empty to omit. -->
+-    <string name="source_panel_service" translatable="false"></string>
++    <string name="source_panel_service" translatable="false">com.cvte.tv.globalui/.InputSourceActivity</string>
+     <string name="source_panel_action" translatable="false"></string>
+     <!-- One int extra sent with the source panel intent, "name=value". Coocaa OS (Skyworth, China) needs
+          control_center_command=100 for its control center to open on the source row, as the remote's
+@@ -122,7 +125,7 @@
+          "key_filter"). Some firmware (TCL Google TV on Android 12) drops key auto-repeat once ANY service
+          filters keys, so long-pressing volume only steps once: set false and the service keeps running but
+          stops filtering, which brings repeat back at the price of the remote buttons below doing nothing. -->
+-    <bool name="key_filter">true</bool>
++    <bool name="key_filter">false</bool>
+ 
+     <!-- With key_filter on, true makes HomeKeyService and InputKeyService stop filtering keys while a game
+          controller is connected, so games see its buttons (Steam Link with an Xbox controller on a TCL G07
+@@ -222,7 +225,7 @@
+          com.xgimi.xrmservice does, on every one of its remote keys, power included (docs/TROUBLESHOOTING.md).
+          Whenever that launcher's home screen comes up anyway, HomeKeyService (HOME_KEY_SERVICE=1) sends the TV
+          straight back here. A theme's config.json can set it too. Leave empty to omit. -->
+-    <string name="stock_home_redirect" translatable="false"></string>
++    <string name="stock_home_redirect" translatable="false">com.cvte.tv.launcher.mars</string>
+ 
+     <!-- For TVs whose firmware opens the Live TV app (live_tv_package) by itself at every power-on, with no setting
+          to change it (Changhong / Homwee boards start com.mediatek.wwtv.tvcenter from its own boot receiver, which
+@@ -257,7 +260,7 @@
+          for Arabic with Western digits), instead of the TV's. For firmware
+          that has no menu entry for the owner's language although the launcher is translated into it (a China-market
+          Xiaomi offers Chinese and English only). Empty, the default, follows the TV. A theme can set it ("locale"). -->
+-    <string name="locale" translatable="false"></string>
++    <string name="locale" translatable="false">ar-u-nu-latn</string>
+ 
+     <!-- A name after the greeting: "Mr. Trịnh" shows GOOD MORNING, MR. TRỊNH. Empty: the greeting alone. -->
+     <string name="greeting_name" translatable="false"></string>
+@@ -387,7 +390,7 @@
+ 
+     <!-- Tiles per row in the grid; the dock always has this many slots. Tiles are 180dp wide at 4 columns and
+          shrink to fit from 5 up (about 144dp at 5, 117dp at 6 on a 1080p TV). -->
+-    <integer name="columns">4</integer>
++    <integer name="columns">5</integer>
+ 
+     <!-- Basic motion is on; advanced effects are opt-in in the launcher's own Settings screen. -->
+     <bool name="animations">true</bool>
+@@ -429,7 +432,7 @@
+ 
+     <!-- Module cards: an app that declares a card (docs/specs/card.md) can stand in for its tile with its own
+          label, caption and glow colour, once you answer Show on the prompt. false: never look for cards or ask. -->
+-    <bool name="module_cards">true</bool>
++    <bool name="module_cards">false</bool>
+ 
+     <!-- Reduced motion: for TVs whose GPU cannot keep up (MediaTek MT5895 on Android 10 is the known case).
+          true keeps the GPU drawing path but calms the movement and draws far fewer frames: the highlight
+@@ -469,7 +472,7 @@
+          colour; the shelf gets a larger name, a "Last opened" line (from the apps Home opened) and dock position
+          dots, the focus glow takes the app's colour and the dock band turns translucent. false keeps the plain
+          shelf. Can also be set with "cinematic_home": true in a theme's config.json. -->
+-    <bool name="cinematic_home">false</bool>
++    <bool name="cinematic_home">true</bool>
+     <!-- With cinematic_home, false leaves out the dock position dots under the app's name, for a quieter shelf. Can
+          also be set with "cinematic_dots": false in a theme's config.json. -->
+     <bool name="cinematic_dots">true</bool>
