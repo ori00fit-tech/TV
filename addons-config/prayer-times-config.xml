@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- العرائش (Larache), المغرب -->
+    <string name="latitude" translatable="false">35.1951</string>
+    <string name="longitude" translatable="false">-6.1540</string>
+    <string name="place" translatable="false">العرائش</string>
+    <!-- 21 = Morocco (وزارة الأوقاف) -->
+    <string name="method" translatable="false">21</string>
+    <color name="accent">#2BB673</color>
+    <bool name="reminders">false</bool>
+</resources>

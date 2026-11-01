@@ -1,10 +1,11 @@
-name: Build launcher APK
+name: Build launcher + addons
 
 on:
   workflow_dispatch:
   push:
     paths:
       - goldvision-launcher.patch
+      - addons-config/**
       - .github/workflows/build-apk.yml
 
 permissions:
@@ -16,7 +17,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
@@ -28,9 +29,16 @@ jobs:
           ref: ${{ env.CLEANYOURTV_COMMIT }}
           path: cleanyourtv
 
-      - name: Apply the Goldvision patch
+      - name: Apply the Goldvision launcher patch
         working-directory: cleanyourtv
         run: git apply --verbose ../goldvision-launcher.patch
+
+      - name: Apply Larache prayer-times config
+        run: |
+          cp addons-config/prayer-times-config.xml \
+             cleanyourtv/addons/prayer-times/app/src/main/res/values/config.xml
+          echo "Prayer city set to:"
+          grep place cleanyourtv/addons/prayer-times/app/src/main/res/values/config.xml
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -38,28 +46,68 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: gradle
-          cache-dependency-path: cleanyourtv/launcher/**/*.gradle*
+          cache-dependency-path: |
+            cleanyourtv/launcher/**/*.gradle*
+            cleanyourtv/addons/**/*.gradle*
 
       - name: Install Android platform 34 and build-tools 34.0.0
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null
 
-      - name: Test and build release APK
+      - name: Build launcher
         working-directory: cleanyourtv/launcher
         run: ./gradlew --no-daemon testReleaseUnitTest assembleRelease
 
-      - name: Check APK size (under 576 KB)
+      - name: Check launcher APK size and stage
         working-directory: cleanyourtv/launcher
         run: |
+          mkdir -p "$GITHUB_WORKSPACE/out"
           apk=app/build/outputs/apk/release/app-release.apk
           size=$(stat -c %s "$apk")
-          echo "APK size: $size bytes"
+          echo "Launcher APK size: $size bytes"
           test "$size" -lt 589824
-          mv "$apk" "$GITHUB_WORKSPACE/goldvision-tvhome.apk"
-          sha256sum "$GITHUB_WORKSPACE/goldvision-tvhome.apk"
+          cp "$apk" "$GITHUB_WORKSPACE/out/goldvision-tvhome.apk"
+          sha256sum "$GITHUB_WORKSPACE/out/goldvision-tvhome.apk"
 
-      - name: Upload APK
+      - name: Build selected addons
+        run: |
+          set -e
+          while read -r addon; do
+            [ -z "$addon" ] && continue
+            echo "======== Building addon: $addon ========"
+            dir="cleanyourtv/addons/$addon"
+            if [ ! -d "$dir" ]; then
+              echo "WARNING: $dir not found, skip"
+              continue
+            fi
+            (
+              cd "$dir"
+              chmod +x gradlew 2>/dev/null || true
+              if [ -f gradlew ]; then
+                ./gradlew --no-daemon assembleRelease
+              else
+                # some addons may use the root gradle
+                cd ../../
+                ./gradlew --no-daemon ":addons:$addon:assembleRelease" 2>/dev/null || \
+                (cd "addons/$addon" && gradle --no-daemon assembleRelease)
+              fi
+            )
+            # find the apk
+            found=$(find "$dir" -name "*-release.apk" -o -name "app-release.apk" 2>/dev/null | head -1)
+            if [ -n "$found" ]; then
+              cp "$found" "$GITHUB_WORKSPACE/out/addon-$addon.apk"
+              echo "Staged addon-$addon.apk ($(stat -c %s "$GITHUB_WORKSPACE/out/addon-$addon.apk") bytes)"
+            else
+              echo "WARNING: no APK found for $addon"
+              find "$dir" -name "*.apk" 2>/dev/null || true
+            fi
+          done < addons-config/addons-list.txt
+
+      - name: List output
+        run: ls -lh out/ && sha256sum out/*
+
+      - name: Upload all APKs
         uses: actions/upload-artifact@v4
         with:
-          name: goldvision-tvhome-apk
-          path: goldvision-tvhome.apk
+          name: goldvision-full-pack
+          path: out/
           retention-days: 30

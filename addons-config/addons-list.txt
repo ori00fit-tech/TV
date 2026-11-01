@@ -1,0 +1,5 @@
+weather
+prayer-times
+photo-screensaver
+sleep-timer
+capacity-stats
