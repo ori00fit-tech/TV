@@ -14,6 +14,7 @@ Java عادي، بلا صلاحية إنترنت، بلا تتبّع، وحجم 
 | اللغة | عربية بأرقام غربية (`ar-u-nu-latn`)، والواجهة من اليمين إلى اليسار |
 | الشريط السفلي (5 خانات) | YouTube، Stremio، MVAS IPTV، Downloader، Play Store |
 | الشكل | `cinematic_home` (صورة التطبيق المحدد تملأ أعلى الشاشة)، 5 أعمدة، خلفية سوداء |
+| الحركة | `reduced_motion=true` — أخف على الـ GPU والرام (مهم لتلفاز 1GB) |
 | تطبيقات مخفية من الشبكة (تبقى مُفعّلة) | `com.stark.store`، `com.cvte.tv.steward`، `com.cvte.tv.pictorial`، `com.android.traceur` |
 | زر Inputs وزر SOURCE على الواجهة | يفتحان `com.cvte.tv.globalui/.InputSourceActivity` |
 | زر Home | `stock_home_redirect=com.cvte.tv.launcher.mars`: كلما ظهرت واجهة CVTE تعيدك خدمة HomeKeyService إلى الواجهة الجديدة |

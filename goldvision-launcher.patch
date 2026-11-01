@@ -118,6 +118,10 @@ index c966c5f..c69e31b 100644
  
      <!-- Reduced motion: for TVs whose GPU cannot keep up (MediaTek MT5895 on Android 10 is the known case).
           true keeps the GPU drawing path but calms the movement and draws far fewer frames: the highlight
+@@ -437,7 +440,7 @@
+          glow stays, the ambient bloom is removed and the focus scale is smaller. -->
+-    <bool name="reduced_motion">false</bool>
++    <bool name="reduced_motion">true</bool>
 @@ -469,7 +472,7 @@
           colour; the shelf gets a larger name, a "Last opened" line (from the apps Home opened) and dock position
           dots, the focus glow takes the app's colour and the dock band turns translucent. false keeps the plain
