@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bluetooth</string>
+    <string name="title">Bluetooth headphones and speakers</string>
+    <string name="no_bluetooth">This TV has no Bluetooth.</string>
+    <string name="bt_off">Bluetooth is off.</string>
+    <string name="turn_on">Turn Bluetooth on</string>
+    <string name="need_permission">Allow \"Nearby devices\" so the app can find your headphones.</string>
+    <string name="allow">Allow</string>
+    <string name="hint">Put the headphones in pairing mode (hold the power button until the light blinks), then press Search.</string>
+    <string name="search">Search for devices</string>
+    <string name="searching">Searching…</string>
+    <string name="paired">Paired devices</string>
+    <string name="found">Nearby devices</string>
+    <string name="none_paired">No paired devices yet.</string>
+    <string name="none_found">Nothing found yet. Is the device in pairing mode?</string>
+    <string name="connected">connected</string>
+    <string name="not_connected">paired, not connected</string>
+    <string name="pairing">pairing…</string>
+    <string name="pairing_with">Pairing with %1$s…</string>
+    <string name="pair_failed">Could not start pairing with %1$s.</string>
+    <string name="paired_ok">%1$s is paired.</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="unpair">Forget this device</string>
+    <string name="cancel">Cancel</string>
+    <string name="connect_hint">Turn the device off and on again: it reconnects to the TV by itself.</string>
+    <string name="unpair_failed">The TV would not forget this device. Reset the headphones\' pairing list instead.</string>
+    <string name="audio_tag">🎧</string>
+</resources>

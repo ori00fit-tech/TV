@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بلوتوث</string>
+    <string name="title">سماعات ومكبرات صوت بلوتوث</string>
+    <string name="no_bluetooth">هذا التلفاز ليس فيه بلوتوث.</string>
+    <string name="bt_off">البلوتوث مطفأ.</string>
+    <string name="turn_on">تشغيل البلوتوث</string>
+    <string name="need_permission">اسمح بإذن \"الأجهزة المجاورة\" حتى يجد التطبيق السماعات.</string>
+    <string name="allow">سماح</string>
+    <string name="hint">ضع السماعات في وضع الاقتران (اضغط زر التشغيل مطوّلاً حتى يومض الضوء)، ثم اضغط بحث.</string>
+    <string name="search">بحث عن الأجهزة</string>
+    <string name="searching">جارٍ البحث…</string>
+    <string name="paired">الأجهزة المقترنة</string>
+    <string name="found">الأجهزة القريبة</string>
+    <string name="none_paired">لا توجد أجهزة مقترنة بعد.</string>
+    <string name="none_found">لم يُعثر على شيء بعد. هل الجهاز في وضع الاقتران؟</string>
+    <string name="connected">متصل</string>
+    <string name="not_connected">مقترن، غير متصل</string>
+    <string name="pairing">جارٍ الاقتران…</string>
+    <string name="pairing_with">جارٍ الاقتران مع %1$s…</string>
+    <string name="pair_failed">تعذّر بدء الاقتران مع %1$s.</string>
+    <string name="paired_ok">تم الاقتران مع %1$s.</string>
+    <string name="connect">اتصال</string>
+    <string name="disconnect">قطع الاتصال</string>
+    <string name="unpair">نسيان هذا الجهاز</string>
+    <string name="cancel">إلغاء</string>
+    <string name="connect_hint">أطفئ الجهاز ثم شغّله: سيتصل بالتلفاز وحده.</string>
+    <string name="unpair_failed">رفض التلفاز نسيان الجهاز. امسح قائمة الاقتران من السماعات نفسها.</string>
+    <string name="audio_tag">🎧</string>
+</resources>

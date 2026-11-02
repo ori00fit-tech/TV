@@ -6,6 +6,7 @@ on:
     paths:
       - goldvision-launcher.patch
       - .github/workflows/build-apk.yml
+      - bluetooth-pair/**
 
 permissions:
   contents: read
@@ -62,4 +63,41 @@ jobs:
         with:
           name: goldvision-tvhome-apk
           path: goldvision-tvhome.apk
+          retention-days: 30
+
+  bluetooth-pair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android platform 34 and build-tools 34.0.0
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Build Bluetooth pairing APK
+        run: gradle --no-daemon -p bluetooth-pair assembleRelease
+
+      - name: Collect APK
+        run: |
+          mv bluetooth-pair/app/build/outputs/apk/release/app-release.apk bluetooth-pair.apk
+          stat -c 'APK size: %s bytes' bluetooth-pair.apk
+          sha256sum bluetooth-pair.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: bluetooth-pair-apk
+          path: bluetooth-pair.apk
           retention-days: 30

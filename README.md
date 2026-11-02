@@ -101,3 +101,27 @@ adb shell pm uninstall com.gathin.tvhome   # حذف تطبيقنا نحن فقط
 ```sh
 nc -zv 192.168.1.143 5555   # يجب أن يفشل الاتصال
 ```
+
+## تطبيق البلوتوث (`bluetooth-pair/`)
+
+إعدادات CVTE في هذا التلفاز تخفي شاشة البلوتوث، رغم أن البلوتوث نفسه يعمل. التطبيق الصغير
+`com.ori.btpair` (اسمه "بلوتوث") يبحث عن السماعات ومكبرات الصوت ويقترن بها. نافذة تأكيد الاقتران
+تأتي من النظام نفسه، وبعد الاقتران يوصل Android الصوت بالسماعات تلقائياً. لا إنترنت ولا إعلانات.
+
+يبنيه سير العمل نفسه، ويظهر في قسم **Artifacts** باسم `bluetooth-pair-apk`.
+
+```sh
+cd ~/storage/downloads && unzip -o bluetooth-pair-apk.zip
+adb push ~/storage/downloads/bluetooth-pair.apk /data/local/tmp/btpair.apk
+adb shell pm install -r /data/local/tmp/btpair.apk
+adb shell rm /data/local/tmp/btpair.apk
+adb shell pm grant com.ori.btpair android.permission.BLUETOOTH_SCAN
+adb shell pm grant com.ori.btpair android.permission.BLUETOOTH_CONNECT
+adb shell am start -n com.ori.btpair/.MainActivity
+```
+
+على التلفاز: ضع السماعات في وضع الاقتران، واضغط **بحث عن الأجهزة**، ثم اختر السماعات (تظهر أولاً مع 🎧).
+للحذف: `adb shell pm uninstall com.ori.btpair`.
+
+كل تشغيل لسير العمل يوقّع التطبيقين بمفتاح جديد. إذا رفض `pm install -r` التحديث بخطأ
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE`، احذف النسخة القديمة أولاً بـ `pm uninstall`، ثم ثبّت الجديدة.
