@@ -33,9 +33,12 @@ Java عادي، بلا صلاحية إنترنت، بلا تتبّع، وحجم 
 | `goldvision-tvhome.apk` | الواجهة الرئيسية (خفيف) |
 | `addon-weather.apk` | الطقس (Open-Meteo، بدون مفتاح) |
 | `addon-prayer-times.apk` | مواقيت الصلاة — **العرائش**، طريقة المغرب (21) |
-| `addon-photo-screensaver.apk` | شاشة توقف بصورك |
+| `addon-photo-screensaver.apk` | شاشة توقف بصورك (قطط / مناظر طبيعية — أضف صورك) |
 | `addon-sleep-timer.apk` | مؤقت إطفاء |
 | `addon-capacity-stats.apk` | حالة الرام والتخزين |
+| `addon-brightness.apk` | تعتيم إضافي + وضع ليلي دافئ |
+| `addon-world-clock.apk` | ساعات عالمية |
+| `addon-digital-rain.apk` | شاشة توقف Matrix (مطر رقمي) |
 
 ### تحميل من GitHub Actions
 

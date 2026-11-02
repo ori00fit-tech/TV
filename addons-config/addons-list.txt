@@ -3,3 +3,6 @@ prayer-times
 photo-screensaver
 sleep-timer
 capacity-stats
+brightness
+world-clock
+digital-rain
