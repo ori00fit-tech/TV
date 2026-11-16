@@ -7,6 +7,7 @@ on:
       - goldvision-launcher.patch
       - .github/workflows/build-apk.yml
       - bluetooth-pair/**
+      - screen-cast/**
 
 permissions:
   contents: read
@@ -65,9 +66,13 @@ jobs:
           path: goldvision-tvhome.apk
           retention-days: 30
 
-  bluetooth-pair:
+  small-apps:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [bluetooth-pair, screen-cast]
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
@@ -86,18 +91,18 @@ jobs:
       - name: Install Android platform 34 and build-tools 34.0.0
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null
 
-      - name: Build Bluetooth pairing APK
-        run: gradle --no-daemon -p bluetooth-pair assembleRelease
+      - name: Build ${{ matrix.app }} APK
+        run: gradle --no-daemon -p ${{ matrix.app }} assembleRelease
 
       - name: Collect APK
         run: |
-          mv bluetooth-pair/app/build/outputs/apk/release/app-release.apk bluetooth-pair.apk
-          stat -c 'APK size: %s bytes' bluetooth-pair.apk
-          sha256sum bluetooth-pair.apk
+          mv ${{ matrix.app }}/app/build/outputs/apk/release/app-release.apk ${{ matrix.app }}.apk
+          stat -c 'APK size: %s bytes' ${{ matrix.app }}.apk
+          sha256sum ${{ matrix.app }}.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: bluetooth-pair-apk
-          path: bluetooth-pair.apk
+          name: ${{ matrix.app }}-apk
+          path: ${{ matrix.app }}.apk
           retention-days: 30

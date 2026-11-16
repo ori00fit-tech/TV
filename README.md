@@ -125,3 +125,19 @@ adb shell am start -n com.ori.btpair/.MainActivity
 
 كل تشغيل لسير العمل يوقّع التطبيقين بمفتاح جديد. إذا رفض `pm install -r` التحديث بخطأ
 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`، احذف النسخة القديمة أولاً بـ `pm uninstall`، ثم ثبّت الجديدة.
+
+## تطبيق عرض الشاشة (`screen-cast/`)
+
+مستقبل Miracast المدمج في التلفاز (`com.droidlogic.miracast/.WiFiDirectMainActivity`) ليس له أيقونة،
+وكانت واجهة CVTE القديمة تفتحه بزر خاص بها. التطبيق `com.ori.screencast` (اسمه "عرض الشاشة")
+أيقونة تفتح المستقبل فقط. بعد فتحه، اختر من هاتف Samsung **DeX** أو **Smart View** ثم اسم التلفاز.
+
+اسم التلفاز في قائمة الهاتف (يظهر بعد إعادة التشغيل):
+`settings put global wifi_p2p_device_name "Goldvision TV"`.
+
+```sh
+cd ~/storage/downloads && unzip -o screen-cast-apk.zip
+adb push ~/storage/downloads/screen-cast.apk /data/local/tmp/cast.apk
+adb shell pm install -r /data/local/tmp/cast.apk
+adb shell rm /data/local/tmp/cast.apk
+```
